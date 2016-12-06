@@ -1,6 +1,7 @@
 from naiveBayes import NaiveBayes
-naiveBayes = NaiveBayes("grasshopper.csv", 2)
-naiveBayes.calculations()
+naiveBayes = NaiveBayes("grasshopper.csv", 3)
+naiveBayes.print_enable = True
+naiveBayes.train()
 
 
-print(naiveBayes.predict([5.1, 7.0]))
+print(naiveBayes.predict([5.1, 'young', 7.0]))
