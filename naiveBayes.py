@@ -6,6 +6,7 @@ class NaiveBayes:
     print_enable = True
     data = None
     labelColumn = None
+    ignoreColumns = []
     rowLength = 0
     labelList = {}
     mean = {}
@@ -15,10 +16,13 @@ class NaiveBayes:
     stringColumns = []
     numberColumns = []
 
-    def __init__(self,path=None, labelColumn=0):
+    def __init__(self,path=None, labelColumn= 0, ignoreColumns = []):
         p = myCsvParser()
         self.data = p.getData(path)
         self.labelColumn = labelColumn
+        for row in self.data:
+            for item in ignoreColumns:
+                row.pop(item)
 
     def train(self):
         temprow = None
@@ -34,20 +38,31 @@ class NaiveBayes:
                 self.standaardDeviatie[labelname] = {}
                 self.mean[labelname] = {}
                 self.countData[labelname] = {}
+
         count = 0
+        column_key = 0
         for f in temprow:
             if count == self.labelColumn:
+                count += 1
+                continue
+            if count in self.ignoreColumns:
+                count += 1
                 continue
             if type(f) is str:
-                self.stringColumns.append(count)
+                self.stringColumns.append(column_key)
             else:
-                self.numberColumns.append(count)
+                self.numberColumns.append(column_key)
             count += 1
+            column_key += 1
 
         for key, value in self.labelList.iteritems():
             n = float(value)
             self.probLabel[key] = (float(n/float(len(self.data))))
+
         self.calculate_with_numbers()
+        for key, value in self.labelList.iteritems():
+            for i in self.stringColumns:
+                self.calculate_with_label(i, class_name=key)
 
     def calculations(self):
         # TODO: write decision algorithm for pro numbers and labels
@@ -55,8 +70,8 @@ class NaiveBayes:
 
     # continues variables
     def calculate_with_numbers(self):
-        for i in range(0, self.rowLength):
-            if i != self.labelColumn and i in self.numberColumns:
+        for i in self.numberColumns:
+            if i != self.labelColumn:
                 totaal = {}
                 for key, value in self.labelList.iteritems():
                     totaal[key] = 0
@@ -66,15 +81,13 @@ class NaiveBayes:
                     self.mean[key][i] = totaal[key]/value
 
         for key, value in self.labelList.iteritems():
-            for i in range(0, self.rowLength):
-                if i != self.labelColumn and i in self.numberColumns:
+            for i in self.numberColumns:
+                if i != self.labelColumn:
                     sse = 0
                     for row in self.data:
                         if row[self.labelColumn] == key:
                             sse += pow(row[i] - self.mean[key][i], 2)
                     self.standaardDeviatie[key][i] = math.sqrt(sse / (value - 1))
-                elif i in self.stringColumns:
-                    self.calculate_with_label(i, class_name= key)
 
         self.print_dict(title='Mean', dictt=self.mean)
 
@@ -113,11 +126,19 @@ class NaiveBayes:
                 if type(item[i]) is str:
                     probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
                 else:
-                    mean = self.mean[key][i]
-                    standaardDev = self.standaardDeviatie[key][i]
                     tempItem = item[i]
-                    probabilty += math.log(self.pdf(mean,standaardDev,tempItem))
+                    train_column_number = i if i < self.labelColumn else i + 1
+
+                    if(train_column_number > len(self.mean[key])):
+                        continue
+
+                    mean = self.mean[key][train_column_number]
+                    standaardDev = self.standaardDeviatie[key][train_column_number]
+                    pro_density = self.pdf(mean,standaardDev,tempItem)
+                    if pro_density > 0:
+                        probabilty += math.log(self.pdf(mean,standaardDev,tempItem))
             prediction.append((probabilty, key))
+        print (prediction)
         return max(prediction)[1]
 
     # re-write it my self
@@ -125,5 +146,8 @@ class NaiveBayes:
         """Probability Density Function computing P(x|y)
         input is the mean, sample standard deviation for all the items in y,
         and x."""
-        ePart = math.pow(math.e, -(x - mean) ** 2 / (2 * ssd ** 2))
-        return (1.0 / (math.sqrt(2 * math.pi) * ssd)) * ePart
+        try:
+            ePart = math.pow(math.e, -(x - mean) ** 2 / (2 * ssd ** 2))
+            return (1.0 / (math.sqrt(2 * math.pi) * ssd)) * ePart
+        except:
+            return 0.0

@@ -3,7 +3,7 @@ import csv
 class myCsvParser:
     data = None
 
-    def getData(self,filePath):
+    def getData(self,filePath, ignore_items = None):
         f = open(filePath)
         self.data = csv.reader(f)
         return self.parseCsv()
