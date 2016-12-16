@@ -3,7 +3,7 @@ import math
 
 
 class NaiveBayes:
-    print_enable = True
+    print_enable = False
     data = None
     labelColumn = None
     ignoreColumns = []
@@ -64,10 +64,6 @@ class NaiveBayes:
             for i in self.stringColumns:
                 self.calculate_with_label(i, class_name=key)
 
-    def calculations(self):
-        # TODO: write decision algorithm for pro numbers and labels
-        return None
-
     # continues variables
     def calculate_with_numbers(self):
         for i in self.numberColumns:
@@ -116,30 +112,33 @@ class NaiveBayes:
             print "------------------------------"
             print ''
 
-    def predict(self, item):
-        prediction = []
-        for key,value in self.labelList.iteritems():
-            probabilty = self.probLabel[key]
-            for i in range(0,len(item)):
+    def predict(self, items):
+        results = []
+        for item in items:
+            prediction = []
+            for key,value in self.labelList.iteritems():
+                probabilty = self.probLabel[key]
+                for i in range(0,len(item)):
 
-                # if value is a label
-                if type(item[i]) is str:
-                    probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
-                else:
-                    tempItem = item[i]
-                    train_column_number = i if i < self.labelColumn else i + 1
+                    # if value is a label
+                    if type(item[i]) is str:
+                        probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
+                    else:
+                        tempItem = item[i]
+                        train_column_number = i if i < self.labelColumn else i + 1
 
-                    if(train_column_number > len(self.mean[key])):
-                        continue
+                        if(train_column_number > len(self.mean[key])):
+                            continue
 
-                    mean = self.mean[key][train_column_number]
-                    standaardDev = self.standaardDeviatie[key][train_column_number]
-                    pro_density = self.pdf(mean,standaardDev,tempItem)
-                    if pro_density > 0:
-                        probabilty += math.log(self.pdf(mean,standaardDev,tempItem))
-            prediction.append((probabilty, key))
-        print (prediction)
-        return max(prediction)[1]
+                        mean = self.mean[key][train_column_number]
+                        standaardDev = self.standaardDeviatie[key][train_column_number]
+                        pro_density = self.pdf(mean,standaardDev,tempItem)
+                        if pro_density > 0:
+                            probabilty += math.log(self.pdf(mean,standaardDev,tempItem))
+                prediction.append((probabilty, key))
+            if self.print_enable: print (prediction)
+            results.append(max(prediction)[1])
+        return results
 
     # re-write it my self
     def pdf(self,mean, ssd, x):
