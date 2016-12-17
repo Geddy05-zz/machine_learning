@@ -3,7 +3,7 @@ import math
 
 
 class NaiveBayes:
-    print_enable = False
+    print_enable = True
     data = None
     labelColumn = None
     ignoreColumns = []

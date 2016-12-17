@@ -19,8 +19,6 @@ class myCsvParser:
             parsed_data.append(row_array)
         return parsed_data
 
-
-
     def is_int(self,item):
         try:
             return int(item)

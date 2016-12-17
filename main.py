@@ -45,8 +45,12 @@ if __name__ == "__main__":
         nb = naiveBayes("Iris.csv","train_iris.csv")
         accuracy(nb[0],nb[1])
     elif data == 2:
-        db = DBScan("dbscan.csv",2)
+        db = DBScan("dbscan.csv",1.5)
         db.clustering(3)
-        print(db.clusters)
+        for key, value in db.clusters.iteritems():
+            print (" Cluster: %d" % key)
+            for item in value:
+                print(item)
+            print("")
     else:
         print("wrong number")
