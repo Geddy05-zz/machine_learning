@@ -24,8 +24,24 @@ class NaiveBayes:
             for item in ignoreColumns:
                 row.pop(item)
 
+    def label_int(self):
+        count_row = 0
+        for row in self.data:
+            count_collum = 0
+            for item in row:
+                if count_collum is self.labelColumn :
+                    count_collum +=1
+                    continue
+                if item < 1:
+                    self.data[count_row][count_collum] = "White"
+                else:
+                    self.data[count_row][count_collum] = "Inked"
+                count_collum += 1
+            count_row += 1
+
     def train(self):
         temprow = None
+
         for row in self.data:
             if not temprow:
                 temprow = row
@@ -63,6 +79,7 @@ class NaiveBayes:
         for key, value in self.labelList.iteritems():
             for i in self.stringColumns:
                 self.calculate_with_label(i, class_name=key)
+        print ("finished Training")
 
     # continues variables
     def calculate_with_numbers(self):
@@ -118,11 +135,12 @@ class NaiveBayes:
             prediction = []
             for key,value in self.labelList.iteritems():
                 probabilty = self.probLabel[key]
-                for i in range(0,len(item)):
+                for i in range(0,len(item)-1):
 
                     # if value is a label
                     if type(item[i]) is str:
-                        probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
+                        if item[i] in self.countData[key][i] :
+                            probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
                     else:
                         tempItem = item[i]
                         train_column_number = i if i < self.labelColumn else i + 1
