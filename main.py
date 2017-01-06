@@ -1,8 +1,13 @@
 from naiveBayes import NaiveBayes
 from dbscan.dbScan import DBScan
 from myCsvParser import myCsvParser
+from decisionTree import decisionTree
+from fractions import Fraction
+
 import csv
 import math
+
+
 class Train_data:
     data = None
     dataLabels = []
@@ -73,6 +78,7 @@ if __name__ == "__main__":
     print( "Select a algorithm")
     print ("1: Naive Bayes")
     print ("2: DBScan")
+    print ("3: DecisionTree")
 
     data = input("Enter a number: ")
 
@@ -92,5 +98,16 @@ if __name__ == "__main__":
             for item in value.points:
                 print(item)
             print("")
+
+    elif data == 3:
+        dt = decisionTree()
+        p = myCsvParser()
+        dataset = p.getData("sunny.csv")
+        for row in dataset:
+            row.pop(0)
+
+        dt.entropy(dataset,4)
+
+        print(0.940 - ((8.0/14.0)*  0.811) - ((6.0/14.0) * 1.0))
     else:
         print("wrong number")
