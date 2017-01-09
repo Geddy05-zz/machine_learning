@@ -1,7 +1,7 @@
 from naiveBayes import NaiveBayes
 from dbscan.dbScan import DBScan
 from myCsvParser import myCsvParser
-from decisionTree import decisionTree
+from decisionTree.decisionTree import decisionTree
 from fractions import Fraction
 
 import csv
@@ -100,13 +100,19 @@ if __name__ == "__main__":
             print("")
 
     elif data == 3:
-        dt = decisionTree()
         p = myCsvParser()
         dataset = p.getData("sunny.csv")
         for row in dataset:
             row.pop(0)
 
-        dt.entropy(dataset,4)
+        dt = decisionTree(dataset=dataset,
+                          class_column= 4,
+                          hasHeader=True)
+
+        print(dt.information_gain(dataset, 4))
+        dt.create_tree()
+
+        # print(dt.prepare_entropy(dataset,4))
 
         print(0.940 - ((8.0/14.0)*  0.811) - ((6.0/14.0) * 1.0))
     else:
