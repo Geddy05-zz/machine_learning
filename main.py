@@ -34,16 +34,19 @@ class Train_data:
             count_row += 1
 
 def naiveBayes(training , test):
+    label_column = 4
+    ignore_list = [0]
+
     print("Start labeling Training Data")
-    naiveBayes = NaiveBayes(training, 0, [])
-    naiveBayes.label_int();
+    naiveBayes = NaiveBayes(training, labelColumn=label_column, ignoreColumns=ignore_list)
+    # naiveBayes.label_int();
     print("Start training")
-    naiveBayes.print_enable = False
+    naiveBayes.print_enable = True
     naiveBayes.train()
 
     print("Start labeling Test Data")
-    t = Train_data(test,0)
-    t.label_int()
+    t = Train_data(test,4)
+    # t.label_int()
 
     print("start classifying")
     return naiveBayes.predict(t.data), t
@@ -83,15 +86,16 @@ if __name__ == "__main__":
     data = input("Enter a number: ")
 
     if data == 1:
-        nb = naiveBayes("train.csv","test.csv")
+        nb = naiveBayes("iris.csv","train_iris.csv",)
         predict = nb[0]
         print(predict)
-        write_to_csv(predict)
+
+        # write_to_csv(predict)
         # accuracy(nb[0],nb[1])
 
     elif data == 2:
-        db = DBScan("dbscan.csv",1.5)
-        db.clustering(3)
+        db = DBScan("dbscan.csv",100)
+        db.clustering(min_points=0)
 
         for value in db.clusters:
             print (" Cluster: %d" % value.name)
@@ -111,6 +115,7 @@ if __name__ == "__main__":
 
         print(dt.information_gain(dataset, 4))
         dt.create_tree()
+        dt.create_subset(None)
 
         # print(dt.prepare_entropy(dataset,4))
 

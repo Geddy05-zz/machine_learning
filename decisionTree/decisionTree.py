@@ -88,8 +88,12 @@ class decisionTree:
         return (values)
 
     def create_subset(self, dataset):
-
-
+        root_node = Node("root")
+        note_one = Node("one")
+        note_two = Node("two")
+        root_node.add_child(note_one)
+        root_node.add_child(note_two)
+        print(root_node)
 
     def create_tree(self):
         information_gain = self.information_gain(self.dataset,self.class_column)
@@ -97,5 +101,3 @@ class decisionTree:
         self.rootTree = Node(highest[0])
         print(self.get_all_values(highest[0]))
         print (self.dataset)
-
-
