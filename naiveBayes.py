@@ -16,13 +16,17 @@ class NaiveBayes:
     stringColumns = []
     numberColumns = []
 
-    def __init__(self,path=None, labelColumn= 0, ignoreColumns = []):
-        p = myCsvParser()
-        self.data = p.getData(path)
+    def __init__(self,path=None, data = None ,labelColumn= 0, ignoreColumns = []):
         self.labelColumn = labelColumn
-        for row in self.data:
-            for item in ignoreColumns:
-                row.pop(item)
+        if path is not None:
+            p = myCsvParser()
+            self.data = p.getData(path)
+            self.labelColumn = labelColumn
+            for row in self.data:
+                for item in ignoreColumns:
+                    row.pop(item)
+        if data is not None:
+            self.data = data
 
     def label_int(self):
         count_row = 0

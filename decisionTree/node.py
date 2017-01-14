@@ -1,6 +1,7 @@
 class Node:
     name = None
     children = []
+    subset = []
     #
     # lambda =x {} predicate
 
@@ -12,3 +13,9 @@ class Node:
 
     def has_children(self):
         return len(self.children) > 0
+
+class Leaf:
+    name = None
+
+    def __init__(self,name):
+        self.name = name

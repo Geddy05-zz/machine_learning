@@ -2,7 +2,7 @@ from naiveBayes import NaiveBayes
 from dbscan.dbScan import DBScan
 from myCsvParser import myCsvParser
 from decisionTree.decisionTree import decisionTree
-from fractions import Fraction
+from imageclustering import Image_clustering
 
 import csv
 import math
@@ -13,10 +13,13 @@ class Train_data:
     dataLabels = []
     labelColumn = None
 
-    def __init__(self,path,labelColumn):
+    def __init__(self,path=None,data=None,labelColumn=[]):
         self.labelColumn = labelColumn
         p = myCsvParser()
-        self.data = p.getData(path)
+        if path:
+            self.data = p.getData(path)
+        elif data:
+            self.data = data
         for row in self.data:
             self.dataLabels.append(row[labelColumn])
             row.pop(labelColumn)
@@ -33,19 +36,42 @@ class Train_data:
                 count_collum += 1
             count_row += 1
 
+def create_dataset(path, ignoreColumn=[],hasHeader = False):
+    p = myCsvParser()
+    data = p.getData(path)
+
+    if hasHeader:
+        data.pop(0)
+    for row in data:
+        for item in ignoreColumn:
+            row.pop(item)
+
+    import random
+    random.shuffle(data)
+    length = len(data)
+    train_length = int(round(length * 0.34))
+    test_length = length - train_length
+    train_data = data[:train_length]
+    test_data = data[test_length:]
+
+    return (train_data , test_data)
+
 def naiveBayes(training , test):
-    label_column = 4
-    ignore_list = [0]
+    label_column = 0
+    ignore_list = []
+
+    data = create_dataset("mushrooms.csv",ignoreColumn=[],hasHeader=True)
 
     print("Start labeling Training Data")
-    naiveBayes = NaiveBayes(training, labelColumn=label_column, ignoreColumns=ignore_list)
+    naiveBayes = NaiveBayes(data=data[0], labelColumn=label_column, ignoreColumns=ignore_list)
     # naiveBayes.label_int();
     print("Start training")
     naiveBayes.print_enable = True
     naiveBayes.train()
 
     print("Start labeling Test Data")
-    t = Train_data(test,4)
+    print (data[1])
+    t = Train_data(data=data[1],labelColumn=0)
     # t.label_int()
 
     print("start classifying")
@@ -91,11 +117,11 @@ if __name__ == "__main__":
         print(predict)
 
         # write_to_csv(predict)
-        # accuracy(nb[0],nb[1])
+        accuracy(nb[0],nb[1])
 
     elif data == 2:
-        db = DBScan("dbscan.csv",100)
-        db.clustering(min_points=0)
+        db = DBScan("dbscan.csv",1.5)
+        db.clustering(min_points=3)
 
         for value in db.clusters:
             print (" Cluster: %d" % value.name)
@@ -115,10 +141,11 @@ if __name__ == "__main__":
 
         print(dt.information_gain(dataset, 4))
         dt.create_tree()
-        dt.create_subset(None)
+        # dt.create_subset(None)
 
         # print(dt.prepare_entropy(dataset,4))
 
         print(0.940 - ((8.0/14.0)*  0.811) - ((6.0/14.0) * 1.0))
     else:
+        Image_clustering().get_image()
         print("wrong number")
