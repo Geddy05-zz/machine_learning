@@ -22,7 +22,7 @@ class Train_data:
             self.data = data
         for row in self.data:
             self.dataLabels.append(row[labelColumn])
-            row.pop(labelColumn)
+            # row.pop(labelColumn)
 
     def label_int(self):
         count_row = 0
@@ -82,8 +82,8 @@ def naiveBayes(training , test):
     return naiveBayes.predict(t.data), t
 
 def accuracy(prediction,train_data):
-    print(prediction)
-
+    print len(prediction)
+    print len(train_data.dataLabels)
     correct = 0.0
     for i in range(0,len(prediction)):
         if train_data.dataLabels[i] == prediction[i]:
@@ -141,15 +141,22 @@ if __name__ == "__main__":
 
         dataset = create_dataset("mushrooms.csv",ignoreColumn=[],hasHeader=True)
 
+        # dt = decisionTree(dataset=dataset[0],
+        #                   class_column= 0,
+        #                   hasHeader=True)
+
         dt = decisionTree(dataset=dataset[0],
-                          class_column= 0,
+                          class_column=0,
                           hasHeader=True)
+
 
         dt.create_tree()
         print("-------------------")
         train = Train_data(data=dataset[1],labelColumn=0)
 
-        result = dt.start_classification(data[1])
+        result = dt.start_classification(dataset[1])
+        print( "training labels")
+        print train.dataLabels
         accuracy(result,train)
 
     else:

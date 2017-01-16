@@ -88,6 +88,8 @@ class decisionTree:
         temp_entropy = {}
 
         for i in range(0,len(temprow)-1):
+            if i == classColumn:
+                continue
             entropy_S = entropy_classes
             values_in_column = {}
             first = True
@@ -120,20 +122,22 @@ class decisionTree:
 
             index = subset[0].index(self.class_header_name)
 
+            #TODO: work with reference all nodes has the same children
             if highest[1] == 0.0:
                 node_name = subset[1][index]
                 leaf = Leaf(node_name)
+                leaf.is_correct_node = lambda x: x == choos
                 print("leaf")
                 print(node.name)
                 print (leaf.name)
                 print(" == ")
-                node.add_child(leaf)
+                node.add_child_node(leaf)
             else:
-                child_node = Node(highest[0] )
+                child_node = Node(highest[0])
                 child_node.is_correct_node = lambda x : x == choos
                 child_node.subset = deepcopy(subset)
                 print(child_node.name)
-                node.add_child(child_node)
+                node.add_child_node(child_node)
                 new_chooses = get_unique_values(subset, label=highest[0])
                 self.expand_tree(child_node,chooses=new_chooses)
 
@@ -156,14 +160,19 @@ class decisionTree:
         results =[]
         header = self.rootTree.subset[0]
         for row in data:
-            results.append(self.classify(self.rootTree,header=header, data = row))
+            result = self.classify(self.rootTree,header=header, data = row)
+            if result:
+                results.append(result)
         return results
 
 
     def classify(self,node,header,data):
         index = header.index(node.name)
         for child_node in node.children:
-            if isinstance(child_node, Leaf):
-                return child_node.name
-            elif child_node.is_correct_node(data[index]):
-                return self.classify(child_node,header=header,data=data)
+            if child_node.is_correct_node(data[index]):
+                if isinstance(child_node, Leaf):
+                    return child_node.name
+                else:
+                    result = self.classify(child_node,header=header,data=data)
+                    if result:
+                        return result
