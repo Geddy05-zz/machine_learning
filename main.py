@@ -36,9 +36,10 @@ class Train_data:
                 count_collum += 1
             count_row += 1
 
-def create_dataset(path, ignoreColumn=[],hasHeader = False):
+def create_dataset(path, ignoreColumn=[],hasHeader = False,removeHeader = False):
     p = myCsvParser()
     data = p.getData(path)
+    tempHeader = data[0] if hasHeader and not removeHeader else None
 
     if hasHeader:
         data.pop(0)
@@ -53,6 +54,9 @@ def create_dataset(path, ignoreColumn=[],hasHeader = False):
     test_length = length - train_length
     train_data = data[:train_length]
     test_data = data[test_length:]
+
+    if hasHeader and not removeHeader:
+        train_data.insert(0,tempHeader)
 
     return (train_data , test_data)
 
@@ -130,22 +134,24 @@ if __name__ == "__main__":
             print("")
 
     elif data == 3:
-        p = myCsvParser()
-        dataset = p.getData("sunny.csv")
-        for row in dataset:
-            row.pop(0)
+        # p = myCsvParser()
+        # dataset = p.getData("mushroom.csv")
+        # for row in dataset:
+        #     row.pop(0)
 
-        dt = decisionTree(dataset=dataset,
-                          class_column= 4,
+        dataset = create_dataset("mushrooms.csv",ignoreColumn=[],hasHeader=True)
+
+        dt = decisionTree(dataset=dataset[0],
+                          class_column= 0,
                           hasHeader=True)
 
-        print(dt.information_gain(dataset, 4))
         dt.create_tree()
-        # dt.create_subset(None)
+        print("-------------------")
+        train = Train_data(data=dataset[1],labelColumn=0)
 
-        # print(dt.prepare_entropy(dataset,4))
+        result = dt.start_classification(data[1])
+        accuracy(result,train)
 
-        print(0.940 - ((8.0/14.0)*  0.811) - ((6.0/14.0) * 1.0))
     else:
         Image_clustering().get_image()
         print("wrong number")

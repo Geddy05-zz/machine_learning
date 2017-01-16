@@ -2,6 +2,7 @@ class Node:
     name = None
     children = []
     subset = []
+    is_correct_node = None
     #
     # lambda =x {} predicate
 

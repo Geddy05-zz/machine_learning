@@ -149,7 +149,7 @@ class NaiveBayes:
                         tempItem = item[i]
                         train_column_number = i if i < self.labelColumn else i + 1
 
-                        if(train_column_number > len(self.mean[key])):
+                        if train_column_number > len(self.mean[key]):
                             continue
 
                         mean = self.mean[key][train_column_number]
