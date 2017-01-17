@@ -50,7 +50,7 @@ def create_dataset(path, ignoreColumn=[],hasHeader = False,removeHeader = False)
     import random
     random.shuffle(data)
     length = len(data)
-    train_length = int(round(length * 0.34))
+    train_length = int(round(length * 0.6))
     test_length = length - train_length
     train_data = data[:train_length]
     test_data = data[test_length:]
@@ -157,6 +157,7 @@ if __name__ == "__main__":
         result = dt.start_classification(dataset[1])
         print( "training labels")
         print train.dataLabels
+        print result
         accuracy(result,train)
 
     else:

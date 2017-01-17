@@ -1,6 +1,6 @@
 from math import log
 import operator
-from node import Node,Leaf
+from node import Node
 from copy import deepcopy
 
 
@@ -81,7 +81,6 @@ class decisionTree:
 
 
     def information_gain(self, dataset, classColumn):
-        # TODO: Check if it is class label
         entropy_classes = self.entropy(dataset=dataset,column= classColumn)
         temprow = dataset[0]
 
@@ -114,65 +113,73 @@ class decisionTree:
 
     def expand_tree(self, node,chooses):
         for choos in chooses:
-            print (choos)
             subset = create_subset(node.subset,node.name,choos)
-            print(subset)
             information_gain = self.information_gain(subset, subset[0].index(self.class_header_name))
             highest = max(information_gain.iteritems(), key=operator.itemgetter(1))
 
             index = subset[0].index(self.class_header_name)
 
-            #TODO: work with reference all nodes has the same children
             if highest[1] == 0.0:
                 node_name = subset[1][index]
-                leaf = Leaf(node_name)
-                leaf.is_correct_node = lambda x: x == choos
-                print("leaf")
-                print(node.name)
-                print (leaf.name)
-                print(" == ")
+                leaf = Node(node_name,choos)
+                leaf.is_leaf = True
                 node.add_child_node(leaf)
             else:
-                child_node = Node(highest[0])
-                child_node.is_correct_node = lambda x : x == choos
+                child_node = Node(highest[0],choos)
                 child_node.subset = deepcopy(subset)
-                print(child_node.name)
                 node.add_child_node(child_node)
                 new_chooses = get_unique_values(subset, label=highest[0])
                 self.expand_tree(child_node,chooses=new_chooses)
 
     def create_tree(self):
+        """
+        function that create the root of the tree
+        we use the information gain for deciding witch variable have the biggest impact.
+
+        :return: nothing
+        """
+
         information_gain = self.information_gain(self.dataset,self.class_column)
         highest = max(information_gain.iteritems(),key=operator.itemgetter(1))
-        self.rootTree = Node(highest[0])
+        self.rootTree = Node(highest[0],None)
         self.rootTree.subset = deepcopy( self.dataset)
         chooses = get_unique_values(self.dataset,label=highest[0])
         print(self.rootTree.name)
         self.expand_tree(self.rootTree,chooses=chooses)
 
     def start_classification(self,data):
+
         """
         function for classify items -> 2d list
 
-        Keyword arguments:
-        data -- 2d list where the second list contains the features of the data point
+        :param data: 2d list where the second list contains the features of the data point
         """
+
         results =[]
         header = self.rootTree.subset[0]
         for row in data:
             result = self.classify(self.rootTree,header=header, data = row)
-            if result:
-                results.append(result)
+            results.append(result)
         return results
 
-
     def classify(self,node,header,data):
+        """
+        function that travels the tree to classify the data point
+
+        :param node: the current parent node where we check what the next node will be.
+        :param header: the header of the data set so we looked to the correct feature
+        :param data: the datapoint we have to classify
+        :return: class a object belong to
+        """
+
         index = header.index(node.name)
+
         for child_node in node.children:
-            if child_node.is_correct_node(data[index]):
-                if isinstance(child_node, Leaf):
+            dat = data[index]
+            print(dat)
+            print child_node.match(data[index])
+            if child_node.match(data[index]):
+                if child_node.is_leaf:
                     return child_node.name
                 else:
-                    result = self.classify(child_node,header=header,data=data)
-                    if result:
-                        return result
+                    return self.classify(child_node,header=header,data=data)
