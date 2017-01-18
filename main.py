@@ -64,7 +64,7 @@ def naiveBayes(training , test):
     label_column = 0
     ignore_list = []
 
-    data = create_dataset("mushrooms.csv",ignoreColumn=[],hasHeader=True)
+    data = create_dataset("mushrooms.csv",ignoreColumn=[],hasHeader=True,removeHeader=True)
 
     print("Start labeling Training Data")
     naiveBayes = NaiveBayes(data=data[0], labelColumn=label_column, ignoreColumns=ignore_list)
@@ -124,8 +124,9 @@ if __name__ == "__main__":
         accuracy(nb[0],nb[1])
 
     elif data == 2:
-        db = DBScan("dbscan.csv",1.5)
-        db.clustering(min_points=3)
+        db = DBScan("stars.csv",0.5,ignoreColumns=[7,6,5,4,3])
+        # db.plot([])
+        db.clustering(min_points=15)
 
         for value in db.clusters:
             print (" Cluster: %d" % value.name)
