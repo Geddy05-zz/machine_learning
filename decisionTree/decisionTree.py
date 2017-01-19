@@ -3,7 +3,6 @@ import operator
 from node import Node
 from copy import deepcopy
 
-
 def create_subset(dataset, columnName, label):
     temp_set = deepcopy(dataset)
     subset = []
