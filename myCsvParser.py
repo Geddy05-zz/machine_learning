@@ -35,7 +35,7 @@ class myCsvParser:
             row_array.append(0)
 
             parsed_data.append(row_array)
-        return parsed_data[:16000]
+        return parsed_data[:20000]
 
     def is_int(self,item):
         try:

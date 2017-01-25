@@ -47,10 +47,11 @@ class decisionTree:
             self.class_header_name = dataset[0][class_column]
             print(dataset[0][class_column])
 
-    def entropy(self,dataset,column,perLabel = False, hasHeader=True):
+    def entropy(self,dataset,column, hasHeader=True):
         first = hasHeader
         self.entropyDict[column]={}
         totaalRecords = 0.0
+
         for row in dataset:
 
             if first:
@@ -66,9 +67,9 @@ class decisionTree:
                         count += 1.0
                 self.entropyDict[column][label] = count
 
-        return self.calculate_entropy(self.entropyDict,column = column , totaal_items=totaalRecords, perLabel= perLabel)
+        return self.calculate_entropy(self.entropyDict,column = column , totaal_items=totaalRecords)
 
-    def calculate_entropy(self, dataset, column, totaal_items, perLabel = False):
+    def calculate_entropy(self, dataset, column, totaal_items):
         entropy = 0.0
         self.entropyPerLabel[column] = {}
 
@@ -88,23 +89,28 @@ class decisionTree:
         for i in range(0,len(temprow)-1):
             if i == classColumn:
                 continue
+
             entropy_S = entropy_classes
             values_in_column = {}
+
+            "skip header"
             first = True
             for row in dataset:
                 if first:
                     first = False
                     continue
+                "counter for amount of times a value is in the data set"
                 label = row[i]
                 if label not in values_in_column:
                     values_in_column[label] = 1
                 else:
                     values_in_column[label] +=1
 
+            "calculate information Gain"
             for item in values_in_column:
                 tempdata = [ val for val in dataset if val[i] == item ]
                 fragment = float(len(tempdata)) / float(len(dataset)-1)
-                entropy = self.entropy(dataset=tempdata, column=classColumn, perLabel=True, hasHeader=False)
+                entropy = self.entropy(dataset=tempdata, column=classColumn, hasHeader=False)
                 entropy_S -= fragment*entropy
 
             temp_entropy[temprow[i]]= entropy_S
@@ -118,6 +124,7 @@ class decisionTree:
 
             index = subset[0].index(self.class_header_name)
 
+            "if highest value is 0.0 create a leaf else create a node and call this function recursif"
             if highest[1] == 0.0:
                 node_name = subset[1][index]
                 leaf = Node(node_name,choos)
@@ -143,7 +150,7 @@ class decisionTree:
         self.rootTree = Node(highest[0],None)
         self.rootTree.subset = deepcopy( self.dataset)
         chooses = get_unique_values(self.dataset,label=highest[0])
-        print(self.rootTree.name)
+        # print(self.rootTree.name)
         self.expand_tree(self.rootTree,chooses=chooses)
 
     def start_classification(self,data):

@@ -28,21 +28,6 @@ class NaiveBayes:
         if data is not None:
             self.data = data
 
-    def label_int(self):
-        count_row = 0
-        for row in self.data:
-            count_collum = 0
-            for item in row:
-                if count_collum is self.labelColumn :
-                    count_collum +=1
-                    continue
-                if item < 1:
-                    self.data[count_row][count_collum] = "White"
-                else:
-                    self.data[count_row][count_collum] = "Inked"
-                count_collum += 1
-            count_row += 1
-
     def train(self):
         temprow = None
 
@@ -65,10 +50,10 @@ class NaiveBayes:
             if count == self.labelColumn:
                 count += 1
                 continue
-            if count in self.ignoreColumns:
+            elif count in self.ignoreColumns:
                 count += 1
                 continue
-            if type(f) is str:
+            elif type(f) is str:
                 self.stringColumns.append(column_key)
             else:
                 self.numberColumns.append(column_key)
@@ -124,21 +109,12 @@ class NaiveBayes:
             else:
                 self.countData[class_name][columnNumber][value] = 1
 
-    def print_dict(self, title="", dictt=None):
-        if self.print_enable:
-            print "------------ " + title + " ------------"
-            for key, value in dictt.iteritems():
-                for k, v in value.iteritems():
-                    print key, k, v
-            print "------------------------------"
-            print ''
-
     def predict(self, items):
         results = []
         for item in items:
             prediction = []
             for key,value in self.labelList.iteritems():
-                probabilty = self.probLabel[key]
+                probabilty = math.log(float (self.probLabel[key]))
                 for i in range(0,len(item)-1):
 
                     # if value is a label
@@ -172,3 +148,12 @@ class NaiveBayes:
             return (1.0 / (math.sqrt(2 * math.pi) * ssd)) * ePart
         except:
             return 0.0
+
+    def print_dict(self, title="", dictt=None):
+        if self.print_enable:
+            print "------------ " + title + " ------------"
+            for key, value in dictt.iteritems():
+                for k, v in value.iteritems():
+                    print key, k, v
+            print "------------------------------"
+            print ''
