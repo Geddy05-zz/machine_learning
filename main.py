@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         data = dataReader.read_data("datasets/stars.csv" , ignore_columns =[7,6,5,4,3])
 
-        db = DBSCAN(data=data,mu=8,epsilon=0.04)
+        db = DBSCAN(data=data,mu=10,epsilon=0.05)
 
         clusters = db.classify()
 
@@ -88,6 +88,7 @@ if __name__ == "__main__":
         dt.create_tree()
         train = Train_data(data=dataset[1],labelColumn=0)
         result = dt.start_classification(dataset[1])
+        print(result)
         accuracy(result,train)
 
     else:

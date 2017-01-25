@@ -45,7 +45,7 @@ class decisionTree:
         if hasHeader:
             self.header = dataset[0]
             self.class_header_name = dataset[0][class_column]
-            print(dataset[0][class_column])
+            # print(dataset[0][class_column])
 
     def entropy(self,dataset,column, hasHeader=True):
         first = hasHeader
@@ -181,9 +181,6 @@ class decisionTree:
         index = header.index(node.name)
 
         for child_node in node.children:
-            dat = data[index]
-            print(dat)
-            print child_node.match(data[index])
             if child_node.match(data[index]):
                 if child_node.is_leaf:
                     return child_node.name

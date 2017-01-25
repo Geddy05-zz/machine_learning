@@ -36,5 +36,5 @@ class dataReader():
         import random
         random.seed(10)
         random.shuffle(data)
-        data = data[:4000]
+        data = data[:12000]
         return data

@@ -1,14 +1,13 @@
 from myCsvParser import myCsvParser
 import math
 
-
 class NaiveBayes:
     print_enable = True
     data = None
     labelColumn = None
     ignoreColumns = []
     rowLength = 0
-    labelList = {}
+    labelslist = {}
     mean = {}
     standaardDeviatie = {}
     probLabel = {}
@@ -29,30 +28,32 @@ class NaiveBayes:
             self.data = data
 
     def train(self):
-        temprow = None
-
         for row in self.data:
-            if not temprow:
-                temprow = row
             self.rowLength = len(row)
             labelname = row[self.labelColumn]
-            if self.labelList.has_key(labelname):
-                self.labelList[labelname] += 1
+
+            # prepare dicts
+            if self.labelslist.has_key(labelname):
+                self.labelslist[labelname] += 1
             else:
-                self.labelList[labelname] = 1
+                self.labelslist[labelname] = 1
                 self.standaardDeviatie[labelname] = {}
                 self.mean[labelname] = {}
                 self.countData[labelname] = {}
 
         count = 0
         column_key = 0
-        for f in temprow:
+        for f in self.data[0]:
+
+            #skip label and ignore columns
             if count == self.labelColumn:
                 count += 1
                 continue
             elif count in self.ignoreColumns:
                 count += 1
                 continue
+
+            #check if it is a discrete or continuous variable
             elif type(f) is str:
                 self.stringColumns.append(column_key)
             else:
@@ -60,29 +61,27 @@ class NaiveBayes:
             count += 1
             column_key += 1
 
-        for key, value in self.labelList.iteritems():
+        for key, value in self.labelslist.iteritems():
             n = float(value)
             self.probLabel[key] = (float(n/float(len(self.data))))
-
-        self.calculate_with_numbers()
-        for key, value in self.labelList.iteritems():
             for i in self.stringColumns:
                 self.calculate_with_label(i, class_name=key)
-        print ("finished Training")
+
+        self.calculate_with_numbers()
 
     # continues variables
     def calculate_with_numbers(self):
         for i in self.numberColumns:
             if i != self.labelColumn:
                 totaal = {}
-                for key, value in self.labelList.iteritems():
+                for key, value in self.labelslist.iteritems():
                     totaal[key] = 0
                     for row in self.data:
                         if key == row[self.labelColumn]:
                             totaal[row[self.labelColumn]] = (totaal[row[self.labelColumn]] + row[i])
                     self.mean[key][i] = totaal[key]/value
 
-        for key, value in self.labelList.iteritems():
+        for key, value in self.labelslist.iteritems():
             for i in self.numberColumns:
                 if i != self.labelColumn:
                     sse = 0
@@ -101,9 +100,12 @@ class NaiveBayes:
         for row in self.data:
             value = row[columnNumber]
             class_row = row[self.labelColumn]
+
+            # skip class column
             if class_row != class_name:
                 continue
 
+            #count nr. of occurrence in data set
             if value in self.countData[class_name][columnNumber]:
                 self.countData[class_name][columnNumber][value] += 1
             else:
@@ -113,14 +115,18 @@ class NaiveBayes:
         results = []
         for item in items:
             prediction = []
-            for key,value in self.labelList.iteritems():
+            for key,value in self.labelslist.iteritems():
                 probabilty = math.log(float (self.probLabel[key]))
                 for i in range(0,len(item)-1):
 
                     # if value is a label
                     if type(item[i]) is str:
-                        if item[i] in self.countData[key][i] :
+
+                        # check if have the value in training set
+                        if item[i] in self.countData[key][i]:
                             probabilty += math.log(float(self.countData[key][i][item[i]]) /value)
+
+                    # continues variables
                     else:
                         tempItem = item[i]
                         train_column_number = i if i < self.labelColumn else i + 1
@@ -138,7 +144,6 @@ class NaiveBayes:
             results.append(max(prediction)[1])
         return results
 
-    # re-write it my self
     def pdf(self,mean, ssd, x):
         """Probability Density Function computing P(x|y)
         input is the mean, sample standard deviation for all the items in y,
