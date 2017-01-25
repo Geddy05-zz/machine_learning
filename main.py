@@ -1,59 +1,31 @@
-from naiveBayes import NaiveBayes
+from naiveBayes.naiveBayes import NaiveBayes
+from dataReader import dataReader
+from train_data import Train_data
+from plot_star_clusters import plot_star_clusters
+
 from dbscan.dbScan import DBScan
-from myCsvParser import myCsvParser
 from decisionTree.decisionTree import decisionTree
-from fractions import Fraction
-
+from imageclustering import Image_clustering
+from dbscan.dbscannew import DBSCAN
 import csv
-import math
 
+def naive_bayes():
+    label_column = 0
+    ignore_list = []
 
-class Train_data:
-    data = None
-    dataLabels = []
-    labelColumn = None
+    data = dataReader.create_dataset("datasets/mushrooms.csv",ignoreColumn=[],hasHeader=True,removeHeader=True)
 
-    def __init__(self,path,labelColumn):
-        self.labelColumn = labelColumn
-        p = myCsvParser()
-        self.data = p.getData(path)
-        for row in self.data:
-            self.dataLabels.append(row[labelColumn])
-            row.pop(labelColumn)
-
-    def label_int(self):
-        count_row = 0
-        for row in self.data:
-            count_collum = 0
-            for item in row:
-                if item < 1:
-                    self.data[count_row][count_collum] = "White"
-                else:
-                    self.data[count_row][count_collum] = "Inked"
-                count_collum += 1
-            count_row += 1
-
-def naiveBayes(training , test):
-    label_column = 4
-    ignore_list = [0]
-
-    print("Start labeling Training Data")
-    naiveBayes = NaiveBayes(training, labelColumn=label_column, ignoreColumns=ignore_list)
-    # naiveBayes.label_int();
-    print("Start training")
-    naiveBayes.print_enable = True
+    naiveBayes = NaiveBayes(data=data[0], labelColumn=label_column, ignoreColumns=ignore_list)
+    naiveBayes.print_enable = False
     naiveBayes.train()
 
-    print("Start labeling Test Data")
-    t = Train_data(test,4)
-    # t.label_int()
+    t = Train_data(data=data[1],labelColumn=0)
 
-    print("start classifying")
     return naiveBayes.predict(t.data), t
 
 def accuracy(prediction,train_data):
-    print(prediction)
-
+    print len(prediction)
+    print len(train_data.dataLabels)
     correct = 0.0
     for i in range(0,len(prediction)):
         if train_data.dataLabels[i] == prediction[i]:
@@ -70,11 +42,7 @@ def write_to_csv(result):
     count = 1
     for data in result:
         csvWriter.writerow([count , data])
-        count += 1
-
-                       # now data, assuming each column has the same # of values
-    # for key, value in result.iteritems():
-        # csvWriter.writerow([key,value])
+        count += 11
 
 if __name__ == "__main__":
 
@@ -82,43 +50,47 @@ if __name__ == "__main__":
     print ("1: Naive Bayes")
     print ("2: DBScan")
     print ("3: DecisionTree")
+    print ("4: image clustering (Work in Progress)")
 
     data = input("Enter a number: ")
 
     if data == 1:
-        nb = naiveBayes("iris.csv","train_iris.csv",)
+        nb = naive_bayes()
         predict = nb[0]
         print(predict)
 
-        # write_to_csv(predict)
-        # accuracy(nb[0],nb[1])
+        accuracy(nb[0],nb[1])
 
     elif data == 2:
-        db = DBScan("dbscan.csv",100)
-        db.clustering(min_points=0)
 
-        for value in db.clusters:
-            print (" Cluster: %d" % value.name)
-            for item in value.points:
-                print(item)
-            print("")
+        data = dataReader.read_data("datasets/stars.csv" , ignore_columns =[7,6,5,4,3])
+
+        db = DBSCAN(data=data,mu=10,epsilon=0.05)
+
+        clusters = db.classify()
+
+        pl = plot_star_clusters()
+        pl.plot_clusters(clusters)
+
+        with open("Output.txt", "w") as text_file:
+            for value in db.clusters:
+                text_file.write("\n\nCluster Name: {}".format(value.name))
+                for item in value.points:
+                    text_file.write("\n\t%s" % item)
 
     elif data == 3:
-        p = myCsvParser()
-        dataset = p.getData("sunny.csv")
-        for row in dataset:
-            row.pop(0)
+        dataset = dataReader.create_dataset("datasets/mushrooms.csv",ignoreColumn=[],hasHeader=True)
 
-        dt = decisionTree(dataset=dataset,
-                          class_column= 4,
+        dt = decisionTree(dataset=dataset[0],
+                          class_column=0,
                           hasHeader=True)
 
-        print(dt.information_gain(dataset, 4))
         dt.create_tree()
-        dt.create_subset(None)
+        train = Train_data(data=dataset[1],labelColumn=0)
+        result = dt.start_classification(dataset[1])
+        print(result)
+        accuracy(result,train)
 
-        # print(dt.prepare_entropy(dataset,4))
-
-        print(0.940 - ((8.0/14.0)*  0.811) - ((6.0/14.0) * 1.0))
     else:
+        Image_clustering().get_image()
         print("wrong number")
