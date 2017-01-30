@@ -1,6 +1,6 @@
 from math import log
 import operator
-from node import Node
+from decisionTree.node import Node
 from copy import deepcopy
 
 def create_subset(dataset, columnName, label):
