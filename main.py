@@ -16,7 +16,7 @@ def naive_bayes():
     data = dataReader.create_dataset("datasets/mushrooms.csv",ignoreColumn=[],hasHeader=True,removeHeader=True)
 
     naiveBayes = NaiveBayes(data=data[0], labelColumn=label_column, ignoreColumns=ignore_list)
-    naiveBayes.print_enable = True
+    naiveBayes.print_enable = False
     naiveBayes.train()
 
     t = Train_data(data=data[1],labelColumn=0)
@@ -24,14 +24,14 @@ def naive_bayes():
     return naiveBayes.predict(t.data), t
 
 def accuracy(prediction,train_data):
-    print(train_data.dataLabels)
+    print len(prediction)
+    print len(train_data.dataLabels)
     correct = 0.0
-    for i in range(0,len(prediction)-1):
+    for i in range(0,len(prediction)):
         if train_data.dataLabels[i] == prediction[i]:
             correct += 1
-    print(correct)
-    print(len(prediction))
-    print (correct / (len(prediction)-1))
+
+    print (correct / len(prediction))
 
 def write_to_csv(result):
     # first write column headers
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     print ("3: DecisionTree")
     print ("4: image clustering (Work in Progress)")
 
-    data = 1
+    data = input("Enter a number: ")
 
     if data == 1:
         nb = naive_bayes()

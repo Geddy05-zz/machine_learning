@@ -16,12 +16,12 @@ class dataReader():
 
         import random
         random.shuffle(data)
-        # random.seed(997)
+        random.seed(10)
         length = len(data)
-        train_length = int(round(length * 1/3))
+        train_length = int(round(length * 0.6))
         test_length = length - train_length
-        train_data = data[train_length:]
-        test_data = data[-test_length:]
+        train_data = data[:train_length]
+        test_data = data[test_length:]
 
         if hasHeader and not removeHeader:
             train_data.insert(0, tempHeader)

@@ -1,4 +1,4 @@
-from dbscan.cluster import Cluster
+from cluster import Cluster
 import math
 import sys
 import math
