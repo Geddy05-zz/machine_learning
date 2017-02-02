@@ -1,5 +1,5 @@
 from myCsvParser import myCsvParser
-from cluster import Cluster
+from dbscan.cluster import Cluster
 import math
 import time, sys
 
@@ -63,7 +63,7 @@ class DBScan:
         cluster_name = 0
         cluster = Cluster(cluster_name)
         self.data_length = len(self.data) - 1
-        print self.data_length
+        print(self.data_length)
 
         while self.count < self.data_length:
             point = self.data[self.count]
